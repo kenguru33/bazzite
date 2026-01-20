@@ -184,11 +184,29 @@ RUN --mount=type=cache,dst=/var/cache \
     --mount=type=tmpfs,dst=/tmp \
     dnf5 -y remove \
         ublue-os-update-services \
-        firefox \
-        firefox-langpacks \
         toolbox \
         htop && \
     /ctx/cleanup
+
+# Add 1Password repository
+RUN --mount=type=cache,dst=/var/cache \
+    --mount=type=cache,dst=/var/log \
+    --mount=type=tmpfs,dst=/tmp \
+    rpm --import https://downloads.1password.com/linux/keys/1password.asc && \
+    dnf5 -y config-manager addrepo \
+      --from-repofile=https://downloads.1password.com/linux/rpm/stable/x86_64/1password.repo
+
+# Install Firefox and 1Password
+RUN --mount=type=cache,dst=/var/cache \
+    --mount=type=cache,dst=/var/log \
+    --mount=type=tmpfs,dst=/tmp \
+    dnf5 -y install \
+        firefox \
+        firefox-langpacks \
+        1password \
+        1password-cli && \
+    /ctx/cleanup
+
 
 # Install new packages
 RUN --mount=type=cache,dst=/var/cache \
